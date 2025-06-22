@@ -14,4 +14,4 @@ After this, click on **Generate token**. Copy and paste it somewhere safe, for y
 
 Create a **.env** file in the project root, and add the following variable in there:
 
-- GITHUB_TOKEN=<your-newly-generated-token>
+- GITHUB_TOKEN={your-newly-generated-token}
