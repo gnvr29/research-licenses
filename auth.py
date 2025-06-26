@@ -1,4 +1,5 @@
 import requests
+import os
 
 FOSSology_URL = 'http://localhost/api/login'
 
@@ -14,6 +15,10 @@ def authenticate(username, password):
     Returns:
     - str: Token de autenticação se sucesso, None se falha.
     """
+
+    username = os.getenv("FOSSOLOGY_USERNAME", "fossy")  
+    password = os.getenv("FOSSOLOGY_PASSWORD", "fossy")  
+
 
     payload = {
         'username': username,
