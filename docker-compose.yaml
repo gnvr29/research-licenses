@@ -1,19 +1,22 @@
+version: "3.8"
+
 services:
   db:
-      image: postgres:13
-      container_name: fossology_db
-      restart: unless-stopped
-      environment:
-        - POSTGRES_USER=fossy
-        - POSTGRES_PASSWORD=fossy
-        - POSTGRES_DB=fossology
-      volumes:
-        - db_data:/var/lib/postgresql/data
-      healthcheck:
-        test: ["CMD-SHELL", "pg_isready -U fossy"]
-        interval: 10s
-        timeout: 5s
-        retries: 5
+    image: postgres:13
+    container_name: fossology_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=fossy
+      - POSTGRES_PASSWORD=fossy
+      - POSTGRES_DB=fossology
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fossy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    platform: linux/amd64  # Forçar a plataforma amd64 (x86_64)
 
   scheduler:
     image: fossology/fossology
@@ -29,7 +32,8 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - repository:/srv/fossology/reposutory
+      - repository:/srv/fossology/repository
+    platform: linux/amd64  # Forçar a plataforma amd64 (x86_64)
 
   fossology_ui:
     image: fossology/fossology
@@ -39,10 +43,10 @@ services:
     ports:
       - "8081:80"
     environment:
-    - FOSSOLOGY_DB_HOST=db
-    - FOSSOLOGY_DB_NAME=fossology
-    - FOSSOLOGY_DB_USER=fossy
-    - FOSSOLOGY_DB_PASSWORD=fossy
+      - FOSSOLOGY_DB_HOST=db
+      - FOSSOLOGY_DB_NAME=fossology
+      - FOSSOLOGY_DB_USER=fossy
+      - FOSSOLOGY_DB_PASSWORD=fossy
     depends_on:
       db:
         condition: service_healthy
@@ -50,8 +54,8 @@ services:
         condition: service_started
     volumes:
       - repository:/srv/fossology/repository
+    platform: linux/amd64  # Forçar a plataforma amd64 (x86_64)
 
 volumes:
   db_data:
   repository:
-      
