@@ -21,7 +21,7 @@ def extract_repos_zip():
     api_url = "https://api.github.com/search/repositories"
 
     search_params = {
-        "q": "language:python -education -books -bootcamp -days -notes -handbook -exercises",
+        "q": "language:python",
         "sort": "forks",
         "order": "desc",
         "per_page": 50
@@ -31,11 +31,18 @@ def extract_repos_zip():
     if not os.path.exists(output_directory):
         os.mkdir(output_directory)
 
+    print("Attempting to fetch repositories from GitHub API...")
     response = requests.get(api_url, params=search_params, headers=request_headers)
 
     if response.status_code == 200:
         repos_data = response.json()
         repositories = repos_data.get("items", [])
+
+        print(f"GitHub API returned {len(repositories)} repositories.")
+        if not repositories:
+            print("No repositories found for the search query. Nothing to download.")
+            return
+
         for i, repo in enumerate(repositories):
             repo_full_name = repo["full_name"]
             default_branch = repo.get("default_branch", "main")
@@ -59,5 +66,5 @@ def extract_repos_zip():
                 print(f"Error saving file {output_path}: {e}")
     else:
         print(f"Error fetching repositories. Status code: {response.status_code}")
-        print(f"Response: {response.text}")
+        print(f"Full response from GitHub: {response.text}")
 
