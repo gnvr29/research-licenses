@@ -1,0 +1,57 @@
+services:
+  db:
+      image: postgres:13
+      container_name: fossology_db
+      restart: unless-stopped
+      environment:
+        - POSTGRES_USER=fossy
+        - POSTGRES_PASSWORD=fossy
+        - POSTGRES_DB=fossology
+      volumes:
+        - db_data:/var/lib/postgresql/data
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U fossy"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+
+  scheduler:
+    image: fossology/fossology
+    container_name: fossology_scheduler
+    restart: unless-stopped
+    command: scheduler
+    environment:
+      - FOSSOLOGY_DB_HOST=db
+      - FOSSOLOGY_DB_NAME=fossology
+      - FOSSOLOGY_DB_USER=fossy
+      - FOSSOLOGY_DB_PASSWORD=fossy
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - repository:/srv/fossology/reposutory
+
+  fossology_ui:
+    image: fossology/fossology
+    container_name: fossology_UI
+    restart: unless-stopped
+    command: web
+    ports:
+      - "8081:80"
+    environment:
+    - FOSSOLOGY_DB_HOST=db
+    - FOSSOLOGY_DB_NAME=fossology
+    - FOSSOLOGY_DB_USER=fossy
+    - FOSSOLOGY_DB_PASSWORD=fossy
+    depends_on:
+      db:
+        condition: service_healthy
+      scheduler:
+        condition: service_started
+    volumes:
+      - repository:/srv/fossology/repository
+
+volumes:
+  db_data:
+  repository:
+      
